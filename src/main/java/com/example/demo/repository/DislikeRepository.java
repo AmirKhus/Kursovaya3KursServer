@@ -25,6 +25,10 @@ public class DislikeRepository implements IRestRepository<Dislike> {
             "FROM \"dislike\" " +
             "WHERE \"userId\" = ?";
 
+    private static String selectByMarkerId= "SELECT \"id\", \"userId\" , \"markerId\"  " +
+            "FROM \"dislike\" " +
+            "WHERE \"markerId\" = ?";
+
     private static String insertQuery = "INSERT INTO \"dislike\"(\"userId\" , \"markerId\" ) " +
             "VALUES (?,?) " +
             "RETURNING \"id\", \"userId\" , \"markerId\"  ";
@@ -78,6 +82,23 @@ public class DislikeRepository implements IRestRepository<Dislike> {
         Object[] params = new Object[]{region_id};
         int[] types = new int[]{Types.INTEGER};
         SqlRowSet rowSet = jdbcOperations.queryForRowSet(selectByUserId, params, types);
+        while (rowSet.next()) {
+            values.add(new Dislike(
+                    rowSet.getInt(1),
+                    rowSet.getInt(2),
+                    rowSet.getInt(3)
+            ));
+        }
+        Dislike[] result = new Dislike[values.size()];
+        result = values.toArray(result);
+        return result;
+    }
+
+    public Dislike[] selectByMarkerId(Integer marker_id) {
+        ArrayList<Dislike> values = new ArrayList<Dislike>();
+        Object[] params = new Object[]{marker_id};
+        int[] types = new int[]{Types.INTEGER};
+        SqlRowSet rowSet = jdbcOperations.queryForRowSet(selectByMarkerId, params, types);
         while (rowSet.next()) {
             values.add(new Dislike(
                     rowSet.getInt(1),

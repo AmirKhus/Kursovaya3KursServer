@@ -21,12 +21,27 @@ public class DislikeController {
 
     @CrossOrigin
     @RequestMapping(value = "", method = RequestMethod.GET)
-    DislikeResource[] getAll(@RequestParam(required = false) Integer userId) {
-        Dislike[] entities = userId == null ?
-                //выводим все записи с помощью селект запроса
-                dislikeRepository.select() :
-                //выводим только те данные которые имеют нужный нам region_id с помощью селект запроса
-                dislikeRepository.selectByUserId(userId);
+    DislikeResource[] getAll(@RequestParam(required = false) Integer userId,
+                             @RequestParam(required = false) Integer markerId) {
+        Dislike[] entities;
+        if (userId == null) {
+            if(markerId == null){
+                entities = dislikeRepository.select();
+            }else {
+                entities = dislikeRepository.selectByMarkerId(markerId);
+            }
+        }else{
+            if (markerId == null) {
+                entities = dislikeRepository.selectByUserId(userId);
+            }else {
+                entities = dislikeRepository.selectByMarkerId(markerId);
+            }
+        }
+//        Dislike[] entities = userId == null ?
+//                //выводим все записи с помощью селект запроса
+//                dislikeRepository.select() :
+//                //выводим только те данные которые имеют нужный нам region_id с помощью селект запроса
+//                dislikeRepository.selectByUserId(userId);
         return Arrays.stream(entities)
                 .map(entity -> {
                     DislikeResource resource = new DislikeResource(entity);
